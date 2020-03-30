@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+
+
+
+logging:
+  file:
+    name: logs/PushWebpage.log
