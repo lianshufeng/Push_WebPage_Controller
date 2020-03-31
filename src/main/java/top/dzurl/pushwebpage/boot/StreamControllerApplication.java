@@ -6,10 +6,10 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan("top.dzurl.pushwebpage.core")
 @SpringBootApplication
-public class PushwebpageApplication {
+public class StreamControllerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PushwebpageApplication.class, args);
+        SpringApplication.run(StreamControllerApplication.class, args);
     }
 
 }

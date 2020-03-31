@@ -11,13 +11,13 @@ import top.dzurl.pushwebpage.core.type.StreamTaskType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class BaseParm {
+public class BaseTaskParm {
 
 
     /**
      * 任务类型
      */
-    private StreamTaskType taskType;
+    private StreamTaskType taskType = StreamTaskType.PushWebPage;
 
 
     /**
@@ -52,4 +52,20 @@ public abstract class BaseParm {
      * 输出的分辨率
      */
     private double outputRate = 1;
+
+    /**
+     * 网页会话超时时间
+     */
+    private long sessionTimeout = 60 * 60 * 24 * 7;
+
+
+    /**
+     * 原地址
+     */
+    private String url;
+
+    /**
+     * 拉流地址
+     */
+    private String pushUrl;
 }

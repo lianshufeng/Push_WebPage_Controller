@@ -2,8 +2,11 @@ server:
   port: 8080
 
 
+push:
+  task:
+    dockerNetWorkName: stream_bridge
 
 
 logging:
   file:
-    name: logs/PushWebpage.log
+    name: logs/StreamController.log

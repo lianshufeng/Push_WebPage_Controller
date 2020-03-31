@@ -5,15 +5,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
-import top.dzurl.pushwebpage.core.model.TaskParm;
+import top.dzurl.pushwebpage.core.model.BaseTaskParm;
+import top.dzurl.pushwebpage.core.service.StreamService;
 
 import java.util.HashMap;
 
 @RestController
-public class PushStreamController {
+public class StreamController {
 
     @Autowired
     private DockerHelper dockerHelper;
+
+    @Autowired
+    private StreamService streamService;
 
 
     /**
@@ -22,13 +26,13 @@ public class PushStreamController {
      * @param parm
      * @return
      */
-    @RequestMapping("run.json")
-    public Object createByJson(@RequestBody TaskParm parm) {
+    @RequestMapping("create.json")
+    public Object createByJson(@RequestBody BaseTaskParm parm) {
         return _create(parm);
     }
 
-    @RequestMapping("run")
-    public Object create(TaskParm parm) {
+    @RequestMapping("create")
+    public Object create(BaseTaskParm parm) {
         return _create(parm);
     }
 
@@ -40,7 +44,7 @@ public class PushStreamController {
 
 
     @RequestMapping("rm")
-    public Object delete(String... id) {
+    public Object rm(String... id) {
         var ret = new HashMap<>();
         for (String i : id) {
             ret.put(i, this.dockerHelper.rm(i));
@@ -55,8 +59,8 @@ public class PushStreamController {
      * @param parm
      * @return
      */
-    private Object _create(TaskParm parm) {
-        return null;
+    private Object _create(BaseTaskParm parm) {
+        return this.streamService.create(parm);
     }
 
 

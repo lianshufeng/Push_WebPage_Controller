@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import top.dzurl.pushwebpage.core.util.JsonUtil;
 
+import java.util.ArrayList;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -41,31 +43,38 @@ public class DockerCurlExecute {
         this.url = url;
     }
 
-
+    public DockerCurlExecute(String url, String method) {
+        this.url = url;
+        this.method = method;
+    }
 
     /**
      * 转换到命令行
      *
      * @return
      */
-    public String toCmd() {
-        String cmd = String.format(CmdTemplate, url);
+    public String[] toCmd() {
+        var cmds = new ArrayList<>();
+        cmds.add(url);
 
         //method
         if (StringUtils.hasText(method)) {
-            cmd += " -X " + method;
+            cmds.add("-X");
+            cmds.add(method);
         }
 
         //是否json格式
         if (isJson()) {
-            cmd += " -H \"Content-Type:application/json\"";
+            cmds.add("-H");
+            cmds.add("\"Content-Type: application/json\"");
         }
 
         if (data != null) {
-            cmd += " -d '" + (isJson() ? JsonUtil.toJson(data) : String.valueOf(data)) + "'";
+            cmds.add("-d");
+            cmds.add("'" + (isJson() ? JsonUtil.toJson(data) : String.valueOf(data)) + "'");
         }
 
-        return cmd;
+        return cmds.toArray(new String[0]);
     }
 
 //    public static void main(String[] args) {

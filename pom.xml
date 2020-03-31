@@ -12,7 +12,7 @@
     <artifactId>StreamController</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>StreamController</name>
-    <description>spring boot</description>
+    <description>ffmpeg chrome</description>
 
 
     <properties>
@@ -26,6 +26,7 @@
         <groovy.version>3.0.1</groovy.version>
         <groovy-eclipse-compiler.version>3.6.0-03</groovy-eclipse-compiler.version>
         <groovy-eclipse-batch.version>3.0.1-01</groovy-eclipse-batch.version>
+        <selenium-java.version>3.141.59</selenium-java.version>
 
         <maven-compiler-plugin.proc>both</maven-compiler-plugin.proc>
     </properties>
@@ -61,7 +62,6 @@
         </dependency>
 
 
-
         <!-- Get Set 需要IDE 安装 lombok plugin -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -77,6 +77,12 @@
             <type>pom</type>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium-java.version}</version>
+        </dependency>
 
     </dependencies>
 

@@ -3,9 +3,11 @@ package top.dzurl.pushwebpage.core.helper
 import groovy.util.logging.Log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.util.FileCopyUtils
 import org.springframework.util.StreamUtils
 import org.springframework.util.StringUtils
 import top.dzurl.pushwebpage.core.conf.PushTaskConf
+import top.dzurl.pushwebpage.core.model.DockerCreate
 import top.dzurl.pushwebpage.core.model.DockerCurlExecute
 import top.dzurl.pushwebpage.core.model.DockerProcess
 import top.dzurl.pushwebpage.core.util.JsonUtil
@@ -17,21 +19,69 @@ import java.util.concurrent.TimeUnit
 @Component
 class DockerHelper {
 
-    /**
-     * 连接方式
-     */
-    private static final String request_url = "curl --unix-socket %s"
-
 
     @Autowired
     private PushTaskConf pushTaskConf
 
 
-    private String meIp = "";
+    private String myIp = "";
+
 
     @Autowired
     private void init() {
+        this.myIp = getMyIp()
+        log.info("local ip : " + myIp)
 
+    }
+
+    /**
+     * 取出本机的ip
+     * @return
+     */
+    String getMyIp() {
+        //取出自己的ip
+        Process process = Runtime.getRuntime().exec("hostname -i")
+        process.waitFor(10, TimeUnit.SECONDS)
+        InputStream inputStream = process.getInputStream()
+        def cmd_ret = StreamUtils.copyToString(inputStream, Charset.forName("UTF-8"))
+        String[] ips = cmd_ret.split(" ")
+        if (ips.length > 0) {
+            return ips[0]
+        }
+        return null
+    }
+
+
+    /**
+     * 获取容器ip
+     * @param id
+     * @return
+     */
+    String getContainerIp(String id) {
+        def ret = executeCmd(new DockerCurlExecute(String.format("http://localhost/containers/%s/json", id)))
+        return ret['NetworkSettings']['Networks'][this.pushTaskConf.getDockerNetWorkName()]['IPAddress']
+    }
+
+
+    /**
+     * 创建docker容器
+     * @param dockerCreate
+     * @return
+     */
+    String run(DockerCreate dockerCreate) {
+        DockerCurlExecute createContainer = new DockerCurlExecute("http://localhost/containers/create", "POST")
+        createContainer.setJson(true)
+        createContainer.setData(dockerCreate)
+
+        //执行命令行
+        String id = executeCmd(createContainer)['Id']
+        if (StringUtils.hasText(id)) {
+            return executeCmd(new DockerCurlExecute(String.format("http://localhost/containers/%s/start", id), "POST")) == [:] ? id : null
+        }
+
+
+        return null
+        //还需要start这个容器
     }
 
 
@@ -81,23 +131,40 @@ class DockerHelper {
      * @return
      */
     private Object executeCmd(DockerCurlExecute execute) {
-        //请求的url
-//        String req_url = String.format(request_url, isPost ? "-XPOST" : "", pushTaskConf.getDockerSock())
-        //命令行
-//        String[] cmds = new String[cmd.length + 1]
-//        cmds[0] = req_url
-//        System.arraycopy(cmd, 0, cmds, 1, cmds.length - 1)
 
-        //将要执行的命令行
-//        String cmdLine = String.join(" ", cmds)
-        String cmdLine = String.format(request_url, pushTaskConf.getDockerSock()) + " " + execute.toCmd()
-        log.info("cmd : " + cmdLine)
-        Process process = Runtime.getRuntime().exec(cmdLine)
+        String dockerSock = pushTaskConf.getDockerSock()
+
+        List<String> cmds = new ArrayList<String>() {
+            {
+                add("curl")
+                add("--unix-socket")
+                add(dockerSock)
+                addAll(execute.toCmd())
+            }
+        }
+
+        //命令行
+        String cmdLine = String.join(" ", cmds.toArray(new String[0]))
+        log.info("cmd -> " + cmdLine)
+
+        //生产sh脚本文件
+        cmdLine = "#!/bin/bash\n" + cmdLine
+        File outFile = new File("/dev/shm/" + UUID.randomUUID().toString().replaceAll("-", "") + ".sh")
+        FileCopyUtils.copy(cmdLine.getBytes("UTF-8"), outFile)
+        log.info("sh -> " + outFile)
+
+
+        Process process = Runtime.getRuntime().exec("sh " + outFile.getPath())
         process.waitFor(10, TimeUnit.SECONDS)
         InputStream inputStream = process.getInputStream()
         def cmd_ret = StreamUtils.copyToString(inputStream, Charset.forName("UTF-8"))
         log.info("ret : " + cmd_ret)
+
+        //删除临时的脚本文件
+        outFile.delete()
+
         return StringUtils.hasText(cmd_ret) ? JsonUtil.toObject(cmd_ret, Object.class) : [:]
     }
+
 
 }
