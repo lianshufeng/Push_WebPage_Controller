@@ -45,7 +45,7 @@ public class PushWebPageStreamService extends StreamTaskService {
 
 
         //创建推流容器
-        DockerCreate dockerCreate = new DockerCreate();
+        DockerCreate dockerCreate = buildDockerCreate();
 
         //设置网桥
         dockerCreate.setNetworkMode(this.pushTaskConf.getDockerNetWorkName());

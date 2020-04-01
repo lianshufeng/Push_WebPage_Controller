@@ -15,6 +15,8 @@ services:
       - ENTRYPOINT=nohup java -Dfile.encoding=UTF-8 -Xmx1000m -Xms600m -Duser.timezone=GMT+8 -Dspring.profiles.active=dev -jar StreamController-0.0.1-SNAPSHOT.jar
     networks:
       - stream
+  ffmpeg_chrome:
+    image: registry.cn-chengdu.aliyuncs.com/1s/ffmpeg_chrome
 
 networks:
   stream:

@@ -10,6 +10,7 @@ import top.dzurl.pushwebpage.core.conf.PushTaskConf
 import top.dzurl.pushwebpage.core.model.DockerCreate
 import top.dzurl.pushwebpage.core.model.DockerCurlExecute
 import top.dzurl.pushwebpage.core.model.DockerProcess
+import top.dzurl.pushwebpage.core.service.task.StreamTaskService
 import top.dzurl.pushwebpage.core.util.JsonUtil
 
 import java.nio.charset.Charset
@@ -23,16 +24,6 @@ class DockerHelper {
     @Autowired
     private PushTaskConf pushTaskConf
 
-
-    private String myIp = "";
-
-
-    @Autowired
-    private void init() {
-        this.myIp = getMyIp()
-        log.info("local ip : " + myIp)
-
-    }
 
     /**
      * 取出本机的ip
@@ -92,11 +83,13 @@ class DockerHelper {
     Object ps() {
         def ret = []
         executeCmd(new DockerCurlExecute("http://localhost/containers/json")).each { it ->
-            DockerProcess dockerProcess = new DockerProcess()
-            dockerProcess.setId(it['Id'])
-            dockerProcess.setCreateTime(it['Created'])
-            dockerProcess.setNames(it['Names'])
-            ret.add(dockerProcess)
+            if (it['Labels'] && it['Labels'][StreamTaskService.DEFAULT_LABELS_Name] == StreamTaskService.DEFAULT_LABELS_Value) {
+                DockerProcess dockerProcess = new DockerProcess()
+                dockerProcess.setId(it['Id'])
+                dockerProcess.setCreateTime(it['Created'])
+                dockerProcess.setNames(it['Names'])
+                ret.add(dockerProcess)
+            }
         }
         return ret
     }
@@ -114,26 +107,13 @@ class DockerHelper {
 
     /**
      * 执行命令行
-     * @param id
-     * @param cmd
-     * @return
-     */
-    Object exec(String id, Object cmd) {
-        return executeCmd(DockerCurlExecute.builder().url(String.format("http://localhost/containers/%s/exec", id)).method("POST").json(true).data(cmd).build())
-    }
-
-
-    /**
-     * 执行命令行
      * @param isPost
      * @param returnObject
      * @param cmd
      * @return
      */
     private Object executeCmd(DockerCurlExecute execute) {
-
         String dockerSock = pushTaskConf.getDockerSock()
-
         List<String> cmds = new ArrayList<String>() {
             {
                 add("curl")

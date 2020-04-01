@@ -54,4 +54,10 @@ public class DockerCreate {
      */
     private Map<String, Map<String, Object>> HostConfig;
 
+
+    /**
+     * 标签
+     */
+    private Map<String, String> Labels;
+
 }
