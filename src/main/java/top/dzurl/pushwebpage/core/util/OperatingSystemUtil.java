@@ -3,14 +3,13 @@ package top.dzurl.pushwebpage.core.util;
 
 import com.sun.management.OperatingSystemMXBean;
 
-import java.io.File;
 import java.lang.management.ManagementFactory;
 
-public class OSUtil {
+public class OperatingSystemUtil {
 
 
     /**
-     * 获取剩余内存
+     * 获取可用的内存
      *
      * @return
      */
@@ -19,12 +18,12 @@ public class OSUtil {
     }
 
     /**
-     * 获取剩余的CPU
+     * 获取可用的CPU使用率
      *
      * @return
      */
-    public static long getAvailableCPU() {
-        return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getFreePhysicalMemorySize();
+    public static double getAvailableCPU() {
+        return 1 - ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getSystemCpuLoad();
     }
 
 

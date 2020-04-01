@@ -36,6 +36,14 @@ public class PushWebPageStreamService extends StreamTaskService {
 
     @Override
     public synchronized TaskResult execute(BaseTaskParm baseParm) {
+
+        //系统可用资源监测
+        StreamTaskState streamTaskState = super.checkOSAvailable();
+        if (streamTaskState != null) {
+            return new TaskResult(streamTaskState);
+        }
+
+
         //创建推流容器
         DockerCreate dockerCreate = new DockerCreate();
 
@@ -68,13 +76,6 @@ public class PushWebPageStreamService extends StreamTaskService {
 
                 }
         );
-
-
-//        //随机端口
-//        dockerCreate.setExposedPorts(Map.of("4444/tcp", Map.of()));
-//        dockerCreate.setHostConfig(Map.of("PortBindings", Map.of("4444/tcp", new Object[]{
-//                Map.of("HostPort", "")
-//        })));
 
 
         String id = dockerHelper.run(dockerCreate);

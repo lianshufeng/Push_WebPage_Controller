@@ -37,15 +37,15 @@ public class PushTaskConf {
 
 
     /**
-     * 保留的内存单位兆字节
+     * 保留的内存
      */
-    private double reservationsMemory = 1024 * 1.5;
+    private double reservationsMemory = 1 * 1024 * 1024 * 1024 * 1.2;
 
 
     /**
      * 保留的CPU百分比
      */
-    private float reservationsCpu = 0.2f;
+    private double reservationsCpu = 0.2f;
 
 
 }

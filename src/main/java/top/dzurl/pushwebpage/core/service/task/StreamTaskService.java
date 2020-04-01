@@ -1,10 +1,17 @@
 package top.dzurl.pushwebpage.core.service.task;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import top.dzurl.pushwebpage.core.conf.PushTaskConf;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.TaskResult;
+import top.dzurl.pushwebpage.core.type.StreamTaskState;
 import top.dzurl.pushwebpage.core.type.StreamTaskType;
+import top.dzurl.pushwebpage.core.util.OperatingSystemUtil;
 
 public abstract class StreamTaskService {
+
+    @Autowired
+    private PushTaskConf pushTaskConf;
 
 
     /**
@@ -24,8 +31,25 @@ public abstract class StreamTaskService {
     public abstract TaskResult execute(BaseTaskParm baseParm);
 
 
+    /**
+     * 检查当前系统是否可用
+     *
+     * @return
+     */
+    public StreamTaskState checkOSAvailable() {
 
+        //内存限制
+        if (OperatingSystemUtil.getAvailableRAM() <= this.pushTaskConf.getReservationsMemory()) {
+            return StreamTaskState.MemoryLimit;
+        }
 
+        //CPU限制
+        if (OperatingSystemUtil.getAvailableCPU() <= this.pushTaskConf.getReservationsCpu()) {
+            return StreamTaskState.CpuLimit;
+        }
+
+        return null;
+    }
 
 
 }
