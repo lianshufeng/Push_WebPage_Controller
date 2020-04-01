@@ -39,12 +39,12 @@ public abstract class StreamTaskService {
     public StreamTaskState checkOSAvailable() {
 
         //内存限制
-        if (OperatingSystemUtil.getAvailableRAM() <= this.pushTaskConf.getReservationsMemory()) {
+        if (this.pushTaskConf.getReservationsMemory() > 0 && OperatingSystemUtil.getAvailableRAM() <= this.pushTaskConf.getReservationsMemory()) {
             return StreamTaskState.MemoryLimit;
         }
 
         //CPU限制
-        if (OperatingSystemUtil.getAvailableCPU() <= this.pushTaskConf.getReservationsCpu()) {
+        if (this.pushTaskConf.getReservationsCpu() > 0 && OperatingSystemUtil.getAvailableCPU() <= this.pushTaskConf.getReservationsCpu()) {
             return StreamTaskState.CpuLimit;
         }
 
