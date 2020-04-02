@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.TaskResult;
 import top.dzurl.pushwebpage.core.service.task.StreamTaskService;
-import top.dzurl.pushwebpage.core.type.StreamTaskState;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class StreamService {
      */
     public TaskResult create(BaseTaskParm taskParm) {
         return this.streamTaskServic.get(String.valueOf(taskParm.getTaskType())).map((it) -> {
-            return it.execute(taskParm);
+            return it.runTask(taskParm);
         }).orElse(null);
     }
 

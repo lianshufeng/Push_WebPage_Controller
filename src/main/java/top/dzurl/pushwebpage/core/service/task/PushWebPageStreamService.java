@@ -37,24 +37,12 @@ public class PushWebPageStreamService extends StreamTaskService {
     @Override
     public synchronized TaskResult execute(BaseTaskParm baseParm) {
 
-        //系统可用资源监测
-        StreamTaskState streamTaskState = super.checkOSAvailable();
-        if (streamTaskState != null) {
-            return new TaskResult(streamTaskState);
-        }
-
-
         //创建推流容器
         DockerCreate dockerCreate = buildDockerCreate();
 
-        //设置网桥
-        dockerCreate.setNetworkMode(this.pushTaskConf.getDockerNetWorkName());
-
-        //设置镜像
-        dockerCreate.setImage(pushTaskConf.getImageUrl());
-
         //挂载
         dockerCreate.setBinds(new String[]{"/dev/shm:/dev/shm"});
+
 
         //运行环境
         dockerCreate.setEnv(new String[]{
@@ -64,8 +52,8 @@ public class PushWebPageStreamService extends StreamTaskService {
                         "SCREEN_WIDTH=" + String.valueOf(baseParm.getScreenWidth()),
                         "SCREEN_HEIGHT=" + String.valueOf(baseParm.getScreenHeight()),
                         //输出分辨率
-                        "Output_WIDTH=" + new BigDecimal(baseParm.getScreenWidth() * baseParm.getOutputRate()).longValue(),
-                        "Output_HEIGHT=" + new BigDecimal(baseParm.getScreenHeight() * baseParm.getOutputRate()).longValue(),
+                        "Output_WIDTH=" + evenNumber(new BigDecimal(baseParm.getScreenWidth() * baseParm.getOutputRate()).longValue()),
+                        "Output_HEIGHT=" + evenNumber(new BigDecimal(baseParm.getScreenHeight() * baseParm.getOutputRate()).longValue()),
                         //码率
                         "Vedio_Bitrate=" + String.valueOf(baseParm.getVedioBitrate() + "k"),
                         "Audio_Bitrate=" + String.valueOf(baseParm.getAudioBitrate() + "k"),
@@ -78,7 +66,7 @@ public class PushWebPageStreamService extends StreamTaskService {
         );
 
 
-        String id = dockerHelper.run(dockerCreate);
+        String id = this.dockerHelper.run(dockerCreate);
         if (StringUtils.hasText(id)) {
             //连接并通信
             String remoteHost = this.dockerHelper.getContainerIp(id) + ":" + this.pushTaskConf.getRemoteHostPort();
@@ -92,6 +80,17 @@ public class PushWebPageStreamService extends StreamTaskService {
         //失败尝试结束这个进程
         this.dockerHelper.rm(id);
         return new TaskResult(StreamTaskState.Error);
+    }
+
+
+    /**
+     * 偶数
+     *
+     * @param num
+     * @return
+     */
+    private static long evenNumber(long num) {
+        return num % 2 == 0 ? num : num + 1;
     }
 
 

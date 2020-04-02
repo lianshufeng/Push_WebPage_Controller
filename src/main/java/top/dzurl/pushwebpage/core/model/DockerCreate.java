@@ -38,12 +38,6 @@ public class DockerCreate {
 
 
     /**
-     * 网桥
-     */
-    private String NetworkMode;
-
-
-    /**
      * 暴露的端口
      */
     private Map<String, Map<String, String>> ExposedPorts;
@@ -52,7 +46,7 @@ public class DockerCreate {
     /**
      * 主机配置
      */
-    private Map<String, Map<String, Object>> HostConfig;
+    private Map<String, Object> HostConfig;
 
 
     /**

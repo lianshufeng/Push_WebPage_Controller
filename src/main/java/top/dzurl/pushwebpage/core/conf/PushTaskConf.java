@@ -48,4 +48,10 @@ public class PushTaskConf {
     private double reservationsCpu = 0.2f;
 
 
+    /**
+     * 限制CPU的核心频率(核心数),支持小数
+     */
+    private float limitCpuCore = 2f;
+
+
 }

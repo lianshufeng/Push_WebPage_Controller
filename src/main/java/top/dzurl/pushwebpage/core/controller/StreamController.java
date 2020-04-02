@@ -1,6 +1,7 @@
 package top.dzurl.pushwebpage.core.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,6 +61,8 @@ public class StreamController {
      * @return
      */
     private Object _create(BaseTaskParm parm) {
+        Assert.hasText(parm.getUrl(), "源数据地址不能为空");
+        Assert.hasText(parm.getPushUrl(), "推流地址不能为空");
         return this.streamService.create(parm);
     }
 
