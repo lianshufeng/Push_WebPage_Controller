@@ -30,7 +30,7 @@ public class StreamService {
      * @param taskParm
      * @return
      */
-    public TaskResult create(BaseTaskParm taskParm) {
+    public synchronized TaskResult create(BaseTaskParm taskParm) {
         return this.streamTaskServic.get(String.valueOf(taskParm.getTaskType())).map((it) -> {
             return it.runTask(taskParm);
         }).orElse(null);

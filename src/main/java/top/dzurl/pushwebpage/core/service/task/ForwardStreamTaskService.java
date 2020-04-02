@@ -20,7 +20,7 @@ public class ForwardStreamTaskService extends StreamTaskService {
     }
 
     @Override
-    public synchronized TaskResult execute(BaseTaskParm baseParm) {
+    public TaskResult execute(BaseTaskParm baseParm) {
         return null;
     }
 }

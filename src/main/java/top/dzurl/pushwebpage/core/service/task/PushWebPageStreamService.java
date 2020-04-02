@@ -35,7 +35,7 @@ public class PushWebPageStreamService extends StreamTaskService {
     }
 
     @Override
-    public synchronized TaskResult execute(BaseTaskParm baseParm) {
+    public TaskResult execute(BaseTaskParm baseParm) {
 
         //创建推流容器
         DockerCreate dockerCreate = buildDockerCreate();
