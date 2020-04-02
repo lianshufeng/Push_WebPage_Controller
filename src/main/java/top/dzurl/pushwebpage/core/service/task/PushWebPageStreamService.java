@@ -71,7 +71,7 @@ public class PushWebPageStreamService extends StreamTaskService {
             //连接并通信
             String remoteHost = this.dockerHelper.getContainerIp(id) + ":" + this.pushTaskConf.getRemoteHostPort();
             log.info("remote ip : " + remoteHost);
-            if (openWebPageUrl(remoteHost, baseParm, 5)) {
+            if (openWebPageUrl(remoteHost, baseParm, 20)) {
                 return new TaskResult(StreamTaskState.Success, id);
             }
         }
@@ -111,7 +111,7 @@ public class PushWebPageStreamService extends StreamTaskService {
 
             //延迟
             try {
-                Thread.sleep(2000l);
+                Thread.sleep(500l);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
