@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import top.dzurl.pushwebpage.core.model.ReportModel;
+
+import java.util.Map;
 
 @Data
 @Component
@@ -52,6 +55,18 @@ public class PushTaskConf {
      * 限制CPU的核心频率(核心数),支持小数
      */
     private float limitCpuCore = 2f;
+
+
+    /**
+     * 每次报告的时间
+     */
+    private long reportTime = 1000 * 60;
+
+
+    /**
+     * 报告
+     */
+    private Map<String, ReportModel> reports;
 
 
 }

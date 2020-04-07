@@ -1,5 +1,6 @@
 package top.dzurl.pushwebpage.core.controller;
 
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
+import top.dzurl.pushwebpage.core.model.report.RequestReport;
+import top.dzurl.pushwebpage.core.model.report.ResponseReport;
 import top.dzurl.pushwebpage.core.service.StreamService;
 
 import java.util.HashMap;
 
+@Log
 @RestController
 public class StreamController {
 
@@ -51,6 +55,19 @@ public class StreamController {
             ret.put(i, this.dockerHelper.rm(i));
         }
         return ret;
+    }
+
+
+    /**
+     * 报告
+     *
+     * @param req
+     * @return
+     */
+    @RequestMapping("report")
+    public ResponseReport report(@RequestBody RequestReport req) {
+        log.info(String.format("report :  %s", req));
+        return new ResponseReport();
     }
 
 

@@ -27,6 +27,7 @@
         <groovy-eclipse-compiler.version>3.6.0-03</groovy-eclipse-compiler.version>
         <groovy-eclipse-batch.version>3.0.1-01</groovy-eclipse-batch.version>
         <selenium-java.version>3.141.59</selenium-java.version>
+        <httpclient.version>4.5.9</httpclient.version>
 
         <maven-compiler-plugin.proc>both</maven-compiler-plugin.proc>
     </properties>
@@ -83,6 +84,14 @@
             <artifactId>selenium-java</artifactId>
             <version>${selenium-java.version}</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+
 
     </dependencies>
 

@@ -1,5 +1,6 @@
 package top.dzurl.pushwebpage.core.service.task;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -17,6 +18,8 @@ import top.dzurl.pushwebpage.core.type.StreamTaskType;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -97,27 +100,39 @@ public class PushWebPageStreamService extends StreamTaskService {
     /**
      * 连接并设置远程网页访问的地址
      */
+    @SneakyThrows
     private boolean openWebPageUrl(String remoteHost, BaseTaskParm baseParm, int tryCount) {
-        for (int i = 0; i < tryCount; i++) {
-            try {
-                WebDriver webDriver = openWebPage(remoteHost, baseParm);
-                if (webDriver != null) {
-                    return true;
+        final Boolean[] ret = new Boolean[]{false};
+        //阻塞当前的主线程
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        new Thread(() -> {
+            for (int i = 0; i < tryCount; i++) {
+                WebDriver webDriver = null;
+                try {
+                    webDriver = openWebPage(remoteHost, baseParm);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.error(e.getMessage());
+
+                //连接成功则退出，并标记结束
+                if (webDriver != null) {
+                    ret[0] = true;
+                    break;
+                }
+
+                //延迟
+                try {
+                    Thread.sleep(500l);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-            //延迟
-            try {
-                Thread.sleep(500l);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            //激活阻塞的主线程
+            countDownLatch.countDown();
+        }).start();
+        countDownLatch.await(60, TimeUnit.SECONDS);
+        return ret[0];
     }
 
     /**
@@ -128,7 +143,6 @@ public class PushWebPageStreamService extends StreamTaskService {
      * @return
      */
     private WebDriver openWebPage(String remoteHost, BaseTaskParm baseParm) throws Exception {
-//        String remoteUrl = "http://192.168.80.128:4444/wd/hub";
         String remoteUrl = "http://" + remoteHost + "/wd/hub";
         log.info("try :  " + remoteUrl);
 

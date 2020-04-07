@@ -7,6 +7,7 @@ push:
     dockerNetWorkName: stream_bridge
 
 
+
 logging:
   file:
     name: logs/StreamController.log

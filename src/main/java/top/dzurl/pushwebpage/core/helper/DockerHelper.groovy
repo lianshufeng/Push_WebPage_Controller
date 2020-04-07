@@ -82,12 +82,13 @@ class DockerHelper {
      */
     Object ps() {
         def ret = []
-        executeCmd(new DockerCurlExecute("http://localhost/containers/json")).each { it ->
+        executeCmd(new DockerCurlExecute("http://localhost/containers/json?all=true")).each { it ->
             if (it['Labels'] && it['Labels'][StreamTaskService.DEFAULT_LABELS_Name] == StreamTaskService.DEFAULT_LABELS_Value) {
                 DockerProcess dockerProcess = new DockerProcess()
                 dockerProcess.setId(it['Id'])
                 dockerProcess.setCreateTime(it['Created'])
                 dockerProcess.setNames(it['Names'])
+                dockerProcess.setState(it['State'])
                 ret.add(dockerProcess)
             }
         }
@@ -103,6 +104,7 @@ class DockerHelper {
     Object rm(String id) {
         return executeCmd(DockerCurlExecute.builder().url(String.format("http://localhost/containers/%s?force=true", id)).method("DELETE").build()) == [:]
     }
+
 
 
     /**

@@ -28,5 +28,10 @@ public class DockerProcess {
      */
     private long createTime;
 
+    /**
+     * 当前状态
+     */
+    private String state;
+
 
 }
