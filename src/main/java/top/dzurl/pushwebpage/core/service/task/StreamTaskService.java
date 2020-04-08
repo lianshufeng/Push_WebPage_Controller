@@ -21,6 +21,8 @@ public abstract class StreamTaskService {
     public final static String DEFAULT_LABELS_Name = "StreamTaskName";
     public final static String DEFAULT_LABELS_Value = "StreamTaskNode";
 
+    public final static String DEFAULT_LABELS_StreamTaskType = "StreamTaskType";
+
     //默认的CPU时间
     private final static long Default_Cpu_Time = 100 * 1000;
 
@@ -58,7 +60,30 @@ public abstract class StreamTaskService {
         if (streamTaskState != null) {
             return new TaskResult(streamTaskState);
         }
+
+        //预处理参数
+        preParm(baseParm);
+
+        //执行任务
         return this.execute(baseParm);
+    }
+
+
+    /**
+     * 预处理参数
+     */
+    protected void preParm(BaseTaskParm baseParm) {
+        //输出的宽度
+        if (baseParm.getOutputWidth() == null) {
+            baseParm.setOutputWidth(evenNumber(baseParm.getScreenWidth() * baseParm.getOutputRate()));
+        }
+
+
+        //输出的高度
+        if (baseParm.getOutputHeight() == null) {
+            baseParm.setOutputHeight(evenNumber(baseParm.getScreenHeight() * baseParm.getOutputRate()));
+        }
+
     }
 
 
@@ -67,10 +92,13 @@ public abstract class StreamTaskService {
      *
      * @return
      */
-    public DockerCreate buildDockerCreate() {
+    public DockerCreate buildDockerCreate(BaseTaskParm baseParm) {
         var dockerCreate = new DockerCreate();
         //设置标识标签
-        dockerCreate.setLabels(Map.of(DEFAULT_LABELS_Name, DEFAULT_LABELS_Value));
+        dockerCreate.setLabels(Map.of(
+                DEFAULT_LABELS_Name, DEFAULT_LABELS_Value,
+                DEFAULT_LABELS_StreamTaskType, String.valueOf(baseParm.getTaskType())
+        ));
 
         //设置镜像
         dockerCreate.setImage(pushTaskConf.getImageUrl());
@@ -108,6 +136,18 @@ public abstract class StreamTaskService {
         }
 
         return null;
+    }
+
+
+    /**
+     * 偶数
+     *
+     * @param num
+     * @return
+     */
+    protected static long evenNumber(Number num) {
+        long ret = num.longValue();
+        return ret % 2 == 0 ? ret : ret + 1;
     }
 
 

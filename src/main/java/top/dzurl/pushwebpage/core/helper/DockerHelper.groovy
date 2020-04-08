@@ -11,6 +11,7 @@ import top.dzurl.pushwebpage.core.model.DockerCreate
 import top.dzurl.pushwebpage.core.model.DockerCurlExecute
 import top.dzurl.pushwebpage.core.model.DockerProcess
 import top.dzurl.pushwebpage.core.service.task.StreamTaskService
+import top.dzurl.pushwebpage.core.type.StreamTaskType
 import top.dzurl.pushwebpage.core.util.JsonUtil
 
 import java.nio.charset.Charset
@@ -89,6 +90,12 @@ class DockerHelper {
                 dockerProcess.setCreateTime(it['Created'])
                 dockerProcess.setNames(it['Names'])
                 dockerProcess.setState(it['State'])
+
+                //任务类型
+                if (it['Labels'][StreamTaskService.DEFAULT_LABELS_StreamTaskType] != null) {
+                    dockerProcess.setTaskType(StreamTaskType.valueOf(it['Labels'][StreamTaskService.DEFAULT_LABELS_StreamTaskType]))
+                }
+
                 ret.add(dockerProcess)
             }
         }
@@ -104,7 +111,6 @@ class DockerHelper {
     Object rm(String id) {
         return executeCmd(DockerCurlExecute.builder().url(String.format("http://localhost/containers/%s?force=true", id)).method("DELETE").build()) == [:]
     }
-
 
 
     /**

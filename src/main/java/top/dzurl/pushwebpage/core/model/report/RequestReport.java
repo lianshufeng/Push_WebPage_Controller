@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import top.dzurl.pushwebpage.core.model.DockerProcess;
+import top.dzurl.pushwebpage.core.model.OSAvailableInfo;
 
 import java.util.Collection;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class RequestReport {
     /**
      * 系统信息
      */
-    private Map<String, Double> os;
+    private OSAvailableInfo os;
 
     /**
      * 进程列表

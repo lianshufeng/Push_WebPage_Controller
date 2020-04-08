@@ -31,7 +31,6 @@ public class BaseTaskParm {
      */
     private long screenHeight = 768;
 
-
     /**
      * 帧率
      */
@@ -52,6 +51,18 @@ public class BaseTaskParm {
      * 输出的分辨率
      */
     private double outputRate = 1;
+
+
+    /**
+     * 输出宽度,如果为空则为屏幕宽度 * rate
+     */
+    private Long outputWidth;
+
+    /**
+     * 输出高度,如果为空则为屏幕高度 * rate
+     */
+    private Long outputHeight;
+
 
     /**
      * 网页会话超时时间

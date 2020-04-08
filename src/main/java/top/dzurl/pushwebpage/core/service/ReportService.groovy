@@ -70,25 +70,12 @@ class ReportService {
      */
     @SneakyThrows
     private void report(ReportModel model) {
-//        def ps = []
-//        dockerHelper.ps().each { it ->
-//            ps.add([
-//                    'id'     : it['id'],
-//                    'state'  : it['state'],
-//                    'created': it['created']
-//            ])
-//        }
-
 
         RequestReport report = new RequestReport()
-        report.setOs(OperatingSystemUtil.getOS())
+        report.setOs(OperatingSystemUtil.getOSAvailableInfo())
         report.setPs(dockerHelper.ps())
         report.setOther(model.getOther())
-//        def req = [
-//                'os'   : OperatingSystemUtil.getOS(),
-//                'ps'   : ps,
-//                'other': model.getOther()
-//        ]
+
 
         HttpModel httpModel = new HttpModel()
         httpModel.setUrl(model.getUrl())

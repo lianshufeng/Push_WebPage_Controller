@@ -41,7 +41,7 @@ public class PushWebPageStreamService extends StreamTaskService {
     public TaskResult execute(BaseTaskParm baseParm) {
 
         //创建推流容器
-        DockerCreate dockerCreate = buildDockerCreate();
+        DockerCreate dockerCreate = buildDockerCreate(baseParm);
 
         //挂载
         dockerCreate.setBinds(new String[]{"/dev/shm:/dev/shm"});
@@ -55,8 +55,8 @@ public class PushWebPageStreamService extends StreamTaskService {
                         "SCREEN_WIDTH=" + String.valueOf(baseParm.getScreenWidth()),
                         "SCREEN_HEIGHT=" + String.valueOf(baseParm.getScreenHeight()),
                         //输出分辨率
-                        "Output_WIDTH=" + evenNumber(new BigDecimal(baseParm.getScreenWidth() * baseParm.getOutputRate()).longValue()),
-                        "Output_HEIGHT=" + evenNumber(new BigDecimal(baseParm.getScreenHeight() * baseParm.getOutputRate()).longValue()),
+                        "Output_WIDTH=" + String.valueOf(baseParm.getOutputWidth()),
+                        "Output_HEIGHT=" + String.valueOf(baseParm.getOutputHeight()),
                         //码率
                         "Vedio_Bitrate=" + String.valueOf(baseParm.getVedioBitrate() + "k"),
                         "Audio_Bitrate=" + String.valueOf(baseParm.getAudioBitrate() + "k"),
@@ -83,17 +83,6 @@ public class PushWebPageStreamService extends StreamTaskService {
         //失败尝试结束这个进程
         this.dockerHelper.rm(id);
         return new TaskResult(StreamTaskState.Error);
-    }
-
-
-    /**
-     * 偶数
-     *
-     * @param num
-     * @return
-     */
-    private static long evenNumber(long num) {
-        return num % 2 == 0 ? num : num + 1;
     }
 
 

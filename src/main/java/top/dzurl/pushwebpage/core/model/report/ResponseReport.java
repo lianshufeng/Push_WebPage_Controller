@@ -14,7 +14,7 @@ public class ResponseReport {
     /**
      * 需要删除的id
      */
-    private Collection removeIds;
+    private Collection<String> removeIds;
 
 
 }

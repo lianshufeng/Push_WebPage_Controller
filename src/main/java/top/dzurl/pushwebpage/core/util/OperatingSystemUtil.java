@@ -2,6 +2,7 @@ package top.dzurl.pushwebpage.core.util;
 
 
 import com.sun.management.OperatingSystemMXBean;
+import top.dzurl.pushwebpage.core.model.OSAvailableInfo;
 
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
@@ -48,11 +49,8 @@ public class OperatingSystemUtil {
      *
      * @return
      */
-    public static Map<String, Double> getOS() {
-        return new HashMap<String, Double>() {{
-            put("cpu", formatNumber(getAvailableCPU()));
-            put("mem", formatNumber((double) OperatingSystemUtil.getAvailableRAM() / OperatingSystemUtil.getTotalRAM()));
-        }};
+    public static OSAvailableInfo getOSAvailableInfo() {
+        return OSAvailableInfo.builder().cpu(formatNumber(getAvailableCPU())).mem(formatNumber((double) OperatingSystemUtil.getAvailableRAM() / OperatingSystemUtil.getTotalRAM())).build();
     }
 
 
