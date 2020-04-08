@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import top.dzurl.pushwebpage.core.model.DockerProcess;
 
 import java.util.Collection;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class RequestReport {
     /**
      * 进程列表
      */
-    private Collection ps;
+    private Collection<DockerProcess> ps;
 
 
     /**

@@ -98,6 +98,15 @@ class ReportService {
         ResponseModel response = HttpClientUtil.request(httpModel)
         log.info("response : " + response)
 
+        //处理需要删除的任务
+        if (response.body && response.body['removeIds']) {
+            response.body['removeIds'].each { it ->
+                {
+                    this.dockerHelper.rm(it)
+                }
+            }
+        }
+
     }
 
 

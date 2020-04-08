@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
+import top.dzurl.pushwebpage.core.model.DockerProcess;
 import top.dzurl.pushwebpage.core.model.report.RequestReport;
 import top.dzurl.pushwebpage.core.model.report.ResponseReport;
 import top.dzurl.pushwebpage.core.service.StreamService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Log
 @RestController
@@ -67,7 +70,13 @@ public class StreamController {
     @RequestMapping("report")
     public ResponseReport report(@RequestBody RequestReport req) {
         log.info(String.format("report :  %s", req));
-        return new ResponseReport();
+        return ResponseReport.builder().removeIds(
+                req.getPs().stream().filter((it) -> {
+                    return "exited".equals(it.getState());
+                }).map((it) -> {
+                    return it.getId();
+                }).collect(Collectors.toList()))
+                .build();
     }
 
 
