@@ -1,7 +1,6 @@
 package top.dzurl.pushwebpage.core.service
 
 import groovy.util.logging.Log
-import lombok.SneakyThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import top.dzurl.pushwebpage.core.conf.PushTaskConf
@@ -27,31 +26,35 @@ class ReportService {
 
 
     @Autowired
-    private PushTaskConf pushTaskConf;
+    private PushTaskConf pushTaskConf
 
     @Autowired
-    private DockerHelper dockerHelper;
+    private DockerHelper dockerHelper
 
     //线程池
-    private ExecutorService executorService;
+    private ExecutorService executorService
 
 
     @Autowired
     void init() {
         if (pushTaskConf.getReportTime() > 0 && pushTaskConf.getReports() != null) {
-            executorService = Executors.newFixedThreadPool(pushTaskConf.getReports().size());
-            Timer timer = new Timer();
+            executorService = Executors.newFixedThreadPool(pushTaskConf.getReports().size())
+            Timer timer = new Timer()
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 void run() {
                     for (Map.Entry<String, ReportModel> entry : pushTaskConf.getReports().entrySet()) {
                         executorService.execute(() -> {
-                            report(entry.getValue());
-                        });
+                            try {
+                                report(entry.getValue())
+                            } catch (Exception e) {
+                                e.printStackTrace()
+                            }
+                        })
                     }
 
                 }
-            }, pushTaskConf.getReportTime(), pushTaskConf.getReportTime());
+            }, pushTaskConf.getReportTime(), pushTaskConf.getReportTime())
         }
 
     }
@@ -59,16 +62,15 @@ class ReportService {
     @PreDestroy
     private void shutdown() {
         if (executorService != null) {
-            executorService.shutdownNow();
+            executorService.shutdownNow()
         }
-        executorService = null;
+        executorService = null
     }
 
 
     /**
      * 报告
      */
-    @SneakyThrows
     private void report(ReportModel model) {
 
         RequestReport report = new RequestReport()
