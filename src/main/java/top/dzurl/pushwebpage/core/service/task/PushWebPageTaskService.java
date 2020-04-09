@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class PushWebPageStreamService extends StreamTaskService {
+public class PushWebPageTaskService extends StreamTaskService {
 
 
     @Autowired

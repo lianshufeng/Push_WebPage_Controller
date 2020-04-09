@@ -7,9 +7,16 @@ public enum StreamTaskType {
 
 
     /**
-     * 转发流
+     * 流转发
      */
-    Forward,
+    StreamForward,
+
+
+    /**
+     * 视频转发
+     */
+    VideoForward,
+
 
     /**
      * Web网页推送
