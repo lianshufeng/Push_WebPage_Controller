@@ -66,7 +66,7 @@ public class PushTaskConf {
     /**
      * 报告
      */
-    private Map<String, ReportModel> reports;
+    private ReportModel report;
 
 
 }

@@ -37,22 +37,19 @@ class ReportService {
 
     @Autowired
     void init() {
-        if (pushTaskConf.getReportTime() > 0 && pushTaskConf.getReports() != null) {
-            executorService = Executors.newFixedThreadPool(pushTaskConf.getReports().size())
+        if (pushTaskConf.getReportTime() > 0 && pushTaskConf.getReport() != null) {
+            executorService = Executors.newFixedThreadPool(1)
             Timer timer = new Timer()
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 void run() {
-                    for (Map.Entry<String, ReportModel> entry : pushTaskConf.getReports().entrySet()) {
-                        executorService.execute(() -> {
-                            try {
-                                report(entry.getValue())
-                            } catch (Exception e) {
-                                e.printStackTrace()
-                            }
-                        })
-                    }
-
+                    executorService.execute(() -> {
+                        try {
+                            report(pushTaskConf.getReport())
+                        } catch (Exception e) {
+                            e.printStackTrace()
+                        }
+                    })
                 }
             }, pushTaskConf.getReportTime(), pushTaskConf.getReportTime())
         }
