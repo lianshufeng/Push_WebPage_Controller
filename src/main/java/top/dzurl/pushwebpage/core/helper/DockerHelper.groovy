@@ -56,6 +56,17 @@ class DockerHelper {
 
 
     /**
+     * 获取容器的状态
+     * @param id
+     * @return
+     */
+    Map<String, Object> getContainerState(String id) {
+        def ret = executeCmd(new DockerCurlExecute(String.format("http://localhost/containers/%s/json", id)))
+        return (ret != null && ret != [] && ret['Id'] == id) ? ret['State'] : null
+    }
+
+
+    /**
      * 创建docker容器
      * @param dockerCreate
      * @return

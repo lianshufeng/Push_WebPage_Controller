@@ -18,6 +18,7 @@ import top.dzurl.pushwebpage.core.type.StreamTaskType;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -69,19 +70,19 @@ public class PushWebPageTaskService extends StreamTaskService {
         );
 
 
-        String id = this.dockerHelper.run(dockerCreate);
-        if (StringUtils.hasText(id)) {
+        String dockerId = this.dockerHelper.run(dockerCreate);
+        if (StringUtils.hasText(dockerId)) {
             //连接并通信
-            String remoteHost = this.dockerHelper.getContainerIp(id) + ":" + this.pushTaskConf.getRemoteHostPort();
+            String remoteHost = this.dockerHelper.getContainerIp(dockerId) + ":" + this.pushTaskConf.getRemoteHostPort();
             log.info("remote ip : " + remoteHost);
-            if (openWebPageUrl(remoteHost, baseParm, 20)) {
-                return new TaskResult(StreamTaskState.Success, id);
+            if (openWebPageUrl(dockerId,remoteHost, baseParm, 20)) {
+                return new TaskResult(StreamTaskState.Success, dockerId);
             }
         }
 
 
         //失败尝试结束这个进程
-        this.dockerHelper.rm(id);
+        this.dockerHelper.rm(dockerId);
         return new TaskResult(StreamTaskState.Error);
     }
 
@@ -90,12 +91,26 @@ public class PushWebPageTaskService extends StreamTaskService {
      * 连接并设置远程网页访问的地址
      */
     @SneakyThrows
-    private boolean openWebPageUrl(String remoteHost, BaseTaskParm baseParm, int tryCount) {
+    private boolean openWebPageUrl(String dockerId,String remoteHost, BaseTaskParm baseParm, int tryCount) {
         final Boolean[] ret = new Boolean[]{false};
         //阻塞当前的主线程
         CountDownLatch countDownLatch = new CountDownLatch(1);
         new Thread(() -> {
             for (int i = 0; i < tryCount; i++) {
+
+                //判断容器状态
+                Map<String,Object>  state = dockerHelper.getContainerState(dockerId);
+                if (state==null){
+                    log.info("docker容器不存在");
+                    break;
+                }
+                if (!(boolean)state.get("Running")){
+                    log.info("docker容器进程状态不为run");
+                    break;
+                }
+
+
+
                 WebDriver webDriver = null;
                 try {
                     webDriver = openWebPage(remoteHost, baseParm);
