@@ -28,6 +28,7 @@
         <groovy-eclipse-batch.version>3.0.1-01</groovy-eclipse-batch.version>
         <selenium-java.version>3.141.59</selenium-java.version>
         <httpclient.version>4.5.9</httpclient.version>
+        <docker.java.version>3.2.1</docker.java.version>
 
         <maven-compiler-plugin.proc>both</maven-compiler-plugin.proc>
     </properties>
@@ -91,6 +92,14 @@
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>${docker.java.version}</version>
+        </dependency>
+
 
 
 
