@@ -1,10 +1,13 @@
 package top.dzurl.pushwebpage.core.service
 
 import groovy.util.logging.Log
+import org.apache.http.auth.AUTH
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import top.dzurl.pushwebpage.core.conf.PushTaskConf
 import top.dzurl.pushwebpage.core.helper.DockerHelper
+import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper
+import top.dzurl.pushwebpage.core.model.DockerProcess
 import top.dzurl.pushwebpage.core.model.ReportModel
 import top.dzurl.pushwebpage.core.model.RequestReportExt
 import top.dzurl.pushwebpage.core.util.DockerProcessUtil
@@ -27,6 +30,9 @@ class ReportService {
 
     @Autowired
     private DockerHelper dockerHelper
+
+    @Autowired
+    private ReportIgnoreSetHelper reportIgnoreSetHelper;
 
 
     //最后一次通次成功的报告
@@ -88,7 +94,9 @@ class ReportService {
      */
     public RequestReportExt getRequestReport() {
 
-        def ps = dockerHelper.ps()
+
+        //取出docker列表
+        def ps = reportIgnoreSetHelper.filter(dockerHelper.ps())
 
 
         ReportModel model = pushTaskConf.getReport()

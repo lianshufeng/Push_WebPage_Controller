@@ -30,7 +30,6 @@ public abstract class StreamTaskService {
     @Autowired
     private PushTaskConf pushTaskConf;
 
-
     /**
      * 任务类型
      *

@@ -2,6 +2,7 @@ package top.dzurl.pushwebpage.core.service.task;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.Super;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -10,13 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.dzurl.pushwebpage.core.conf.PushTaskConf;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
+import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.DockerCreate;
 import top.dzurl.pushwebpage.core.model.TaskResult;
 import top.dzurl.pushwebpage.core.type.StreamTaskState;
 import top.dzurl.pushwebpage.core.type.StreamTaskType;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -26,6 +27,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PushWebPageTaskService extends StreamTaskService {
 
+
+    @Autowired
+    private ReportIgnoreSetHelper reportIgnoreSetHelper;
 
     @Autowired
     private DockerHelper dockerHelper;
@@ -71,19 +75,28 @@ public class PushWebPageTaskService extends StreamTaskService {
 
 
         String dockerId = this.dockerHelper.run(dockerCreate);
+        //增加到忽略列表
+        this.reportIgnoreSetHelper.add(dockerId);
+
         if (StringUtils.hasText(dockerId)) {
             //连接并通信
             String remoteHost = this.dockerHelper.getContainerIp(dockerId) + ":" + this.pushTaskConf.getRemoteHostPort();
             log.info("remote ip : " + remoteHost);
-            if (openWebPageUrl(dockerId,remoteHost, baseParm, 20)) {
-                return new TaskResult(StreamTaskState.Success, dockerId);
+            if (openWebPageUrl(dockerId, remoteHost, baseParm, 20)) {
+                return buildTaskResult(StreamTaskState.Success, dockerId);
             }
         }
 
 
         //失败尝试结束这个进程
         this.dockerHelper.rm(dockerId);
-        return new TaskResult(StreamTaskState.Error);
+        return buildTaskResult(StreamTaskState.Error, null);
+    }
+
+
+    private TaskResult buildTaskResult(StreamTaskState state, String dockerId) {
+        this.reportIgnoreSetHelper.remove(dockerId);
+        return new TaskResult(state, dockerId);
     }
 
 
@@ -91,7 +104,7 @@ public class PushWebPageTaskService extends StreamTaskService {
      * 连接并设置远程网页访问的地址
      */
     @SneakyThrows
-    private boolean openWebPageUrl(String dockerId,String remoteHost, BaseTaskParm baseParm, int tryCount) {
+    private boolean openWebPageUrl(String dockerId, String remoteHost, BaseTaskParm baseParm, int tryCount) {
         final Boolean[] ret = new Boolean[]{false};
         //阻塞当前的主线程
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -99,16 +112,15 @@ public class PushWebPageTaskService extends StreamTaskService {
             for (int i = 0; i < tryCount; i++) {
 
                 //判断容器状态
-                Map<String,Object>  state = dockerHelper.getContainerState(dockerId);
-                if (state==null){
+                Map<String, Object> state = dockerHelper.getContainerState(dockerId);
+                if (state == null) {
                     log.info("docker容器不存在");
                     break;
                 }
-                if (!(boolean)state.get("Running")){
+                if (!(boolean) state.get("Running")) {
                     log.info("docker容器进程状态不为run");
                     break;
                 }
-
 
 
                 WebDriver webDriver = null;

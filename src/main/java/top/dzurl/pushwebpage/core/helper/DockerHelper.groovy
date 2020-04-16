@@ -93,7 +93,7 @@ class DockerHelper {
      * docker ps
      * @return
      */
-    Object ps() {
+    DockerProcess[] ps() {
         def ret = []
         executeCmd(new DockerCurlExecute("http://localhost/containers/json?all=true")).each { it ->
             if (it['Labels'] && it['Labels'][StreamTaskService.DEFAULT_LABELS_Name] == StreamTaskService.DEFAULT_LABELS_Value) {
