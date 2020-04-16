@@ -7,8 +7,6 @@ import top.dzurl.pushwebpage.core.model.OSAvailableInfo;
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OperatingSystemUtil {
 
@@ -50,7 +48,10 @@ public class OperatingSystemUtil {
      * @return
      */
     public static OSAvailableInfo getOSAvailableInfo() {
-        return OSAvailableInfo.builder().cpu(formatNumber(getAvailableCPU())).mem(formatNumber((double) OperatingSystemUtil.getAvailableRAM() / OperatingSystemUtil.getTotalRAM())).build();
+        OSAvailableInfo osAvailableInfo = new OSAvailableInfo();
+        osAvailableInfo.setCpu(formatNumber(getAvailableCPU()));
+        osAvailableInfo.setMem(formatNumber((double) OperatingSystemUtil.getAvailableRAM() / OperatingSystemUtil.getTotalRAM()));
+        return osAvailableInfo;
     }
 
 

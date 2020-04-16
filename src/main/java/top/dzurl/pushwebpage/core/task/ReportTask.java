@@ -79,7 +79,7 @@ public class ReportTask {
     /**
      * 添加一次报告
      */
-    private synchronized void addReportsRecords() {
+    public synchronized void addReportsRecords() {
         synchronized (recordReportCount) {
             recordReportCount++;
         }

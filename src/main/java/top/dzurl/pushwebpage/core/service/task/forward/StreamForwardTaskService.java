@@ -15,7 +15,7 @@ public class StreamForwardTaskService extends SuperForwardTaskService {
 
     @Override
     public String getFfmpeg_cmd_template() {
-        return "ffmpeg -i ${url}  -vcodec libx264 -preset ultrafast  -r ${frameRate} -b:v ${vedioBitrate}k -b:a ${audioBitrate}k ${outputSize} -f flv ${pushUrl} ";
+        return "ffmpeg -i ${url}  -vcodec libx264 -preset ultrafast  -r ${frameRate} -c:a aac -b:v ${vedioBitrate}k -b:a ${audioBitrate}k ${outputSize} -f flv ${pushUrl} ";
     }
 
 }

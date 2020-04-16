@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import top.dzurl.pushwebpage.core.conf.PushTaskConf;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.DockerCreate;
+import top.dzurl.pushwebpage.core.model.OSAvailableInfo;
 import top.dzurl.pushwebpage.core.model.TaskResult;
 import top.dzurl.pushwebpage.core.type.StreamTaskState;
 import top.dzurl.pushwebpage.core.type.StreamTaskType;
@@ -123,18 +124,40 @@ public abstract class StreamTaskService {
      * @return
      */
     protected StreamTaskState checkOSAvailable() {
+        return checkOSAvailable(this.pushTaskConf);
+    }
 
+
+    /**
+     * 检查OS是否可用
+     *
+     * @param pushTaskConf
+     * @return
+     */
+    public static StreamTaskState checkOSAvailable(PushTaskConf pushTaskConf) {
         //内存限制
-        if (this.pushTaskConf.getReservationsMemory() > 0 && OperatingSystemUtil.getAvailableRAM() <= this.pushTaskConf.getReservationsMemory()) {
+        if (pushTaskConf.getReservationsMemory() > 0 && OperatingSystemUtil.getAvailableRAM() <= pushTaskConf.getReservationsMemory()) {
             return StreamTaskState.MemoryLimit;
         }
 
         //CPU限制
-        if (this.pushTaskConf.getReservationsCpu() > 0 && OperatingSystemUtil.getAvailableCPU() <= this.pushTaskConf.getReservationsCpu()) {
+        if (pushTaskConf.getReservationsCpu() > 0 && OperatingSystemUtil.getAvailableCPU() <= pushTaskConf.getReservationsCpu()) {
             return StreamTaskState.CpuLimit;
         }
-
         return null;
+    }
+
+
+    /**
+     * 获取可用的CPU
+     *
+     * @param pushTaskConf
+     * @return
+     */
+    public static OSAvailableInfo getOSAvailableInfo(PushTaskConf pushTaskConf) {
+        OSAvailableInfo osAvailableInfo = OperatingSystemUtil.getOSAvailableInfo();
+        osAvailableInfo.setDisable(checkOSAvailable(pushTaskConf) != null);
+        return osAvailableInfo;
     }
 
 

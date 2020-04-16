@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bind.annotation.Super;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.DockerCreate;
 import top.dzurl.pushwebpage.core.model.TaskResult;
+import top.dzurl.pushwebpage.core.task.ReportTask;
 import top.dzurl.pushwebpage.core.type.StreamTaskState;
 import top.dzurl.pushwebpage.core.type.StreamTaskType;
 
@@ -36,6 +38,9 @@ public class PushWebPageTaskService extends StreamTaskService {
 
     @Autowired
     private PushTaskConf pushTaskConf;
+
+    @Autowired
+    private ReportTask reportTask;
 
     @Override
     public StreamTaskType taskType() {
@@ -95,7 +100,11 @@ public class PushWebPageTaskService extends StreamTaskService {
 
 
     private TaskResult buildTaskResult(StreamTaskState state, String dockerId) {
+        //删除忽略列表
         this.reportIgnoreSetHelper.remove(dockerId);
+        //手动增加报告任务
+        this.reportTask.addReportsRecords();
+
         return new TaskResult(state, dockerId);
     }
 
@@ -190,9 +199,11 @@ public class PushWebPageTaskService extends StreamTaskService {
         //禁用了缓存渲染
         options.addArguments("--disable-dev-shm-usage");
 
-
         // 设置允许弹框
         options.addArguments("disable-infobars", "disable-web-security");
+
+        //启用默认的音频
+        options.addArguments("--disable-features=AudioServiceOutOfProcess");
 
 
         //进行访问
@@ -200,6 +211,7 @@ public class PushWebPageTaskService extends StreamTaskService {
 //        log.info(driver.findElement(By.tagName("body")).getText());
         return driver;
     }
+
 
 
 }

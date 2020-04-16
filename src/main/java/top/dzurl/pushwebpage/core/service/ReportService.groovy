@@ -1,17 +1,16 @@
 package top.dzurl.pushwebpage.core.service
 
 import groovy.util.logging.Log
-import org.apache.http.auth.AUTH
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.util.StringUtils
 import top.dzurl.pushwebpage.core.conf.PushTaskConf
 import top.dzurl.pushwebpage.core.helper.DockerHelper
 import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper
-import top.dzurl.pushwebpage.core.model.DockerProcess
 import top.dzurl.pushwebpage.core.model.ReportModel
 import top.dzurl.pushwebpage.core.model.RequestReportExt
+import top.dzurl.pushwebpage.core.service.task.StreamTaskService
 import top.dzurl.pushwebpage.core.util.DockerProcessUtil
-import top.dzurl.pushwebpage.core.util.OperatingSystemUtil
 import top.dzurl.pushwebpage.core.util.apache.HttpClientUtil
 import top.dzurl.pushwebpage.core.util.apache.HttpModel
 import top.dzurl.pushwebpage.core.util.apache.MethodType
@@ -46,7 +45,7 @@ class ReportService {
         ReportModel model = pushTaskConf.getReport()
 
         //是否有配置报告
-        if (model == null) {
+        if (model == null || !StringUtils.hasText(model.getUrl())) {
             return
         }
 
@@ -101,9 +100,13 @@ class ReportService {
 
         ReportModel model = pushTaskConf.getReport()
         RequestReportExt report = new RequestReportExt()
-        report.setOs(OperatingSystemUtil.getOSAvailableInfo())
+        report.setOs(StreamTaskService.getOSAvailableInfo(pushTaskConf))
         report.setPs(ps)
         report.setOther(model.getOther())
+
+
+        //检查服务器是否还可用
+
 
         //设置hash
         report.setHash(DockerProcessUtil.getHashByState(ps))

@@ -20,4 +20,10 @@ public class OSAvailableInfo {
      * CPU
      */
     private double cpu;
+
+
+    /**
+     * 是否被禁用，影响这个值的为内存和cpu策略
+     */
+    private boolean disable;
 }
