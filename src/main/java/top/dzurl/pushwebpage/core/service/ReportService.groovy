@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 import top.dzurl.pushwebpage.core.conf.PushTaskConf
 import top.dzurl.pushwebpage.core.helper.DockerHelper
-import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper
+import top.dzurl.pushwebpage.core.helper.ReportIgnoreHelper
 import top.dzurl.pushwebpage.core.model.ReportModel
 import top.dzurl.pushwebpage.core.model.RequestReportExt
 import top.dzurl.pushwebpage.core.service.task.StreamTaskService
@@ -31,7 +31,7 @@ class ReportService {
     private DockerHelper dockerHelper
 
     @Autowired
-    private ReportIgnoreSetHelper reportIgnoreSetHelper;
+    private ReportIgnoreHelper reportIgnoreHelper;
 
 
     //最后一次通次成功的报告
@@ -95,7 +95,7 @@ class ReportService {
 
 
         //取出docker列表
-        def ps = reportIgnoreSetHelper.filter(dockerHelper.ps())
+        def ps = reportIgnoreHelper.filter(dockerHelper.ps())
 
 
         ReportModel model = pushTaskConf.getReport()

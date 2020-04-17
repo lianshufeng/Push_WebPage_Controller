@@ -2,9 +2,7 @@ package top.dzurl.pushwebpage.core.service.task;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bind.annotation.Super;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.dzurl.pushwebpage.core.conf.PushTaskConf;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
-import top.dzurl.pushwebpage.core.helper.ReportIgnoreSetHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
 import top.dzurl.pushwebpage.core.model.DockerCreate;
 import top.dzurl.pushwebpage.core.model.TaskResult;
@@ -29,9 +26,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PushWebPageTaskService extends StreamTaskService {
 
-
-    @Autowired
-    private ReportIgnoreSetHelper reportIgnoreSetHelper;
 
     @Autowired
     private DockerHelper dockerHelper;
@@ -80,8 +74,6 @@ public class PushWebPageTaskService extends StreamTaskService {
 
 
         String dockerId = this.dockerHelper.run(dockerCreate);
-        //增加到忽略列表
-        this.reportIgnoreSetHelper.add(dockerId);
 
         if (StringUtils.hasText(dockerId)) {
             //连接并通信
@@ -100,8 +92,6 @@ public class PushWebPageTaskService extends StreamTaskService {
 
 
     private TaskResult buildTaskResult(StreamTaskState state, String dockerId) {
-        //删除忽略列表
-        this.reportIgnoreSetHelper.remove(dockerId);
         //手动增加报告任务
         this.reportTask.addReportsRecords();
 
@@ -211,7 +201,6 @@ public class PushWebPageTaskService extends StreamTaskService {
 //        log.info(driver.findElement(By.tagName("body")).getText());
         return driver;
     }
-
 
 
 }
