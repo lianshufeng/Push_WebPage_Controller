@@ -1,6 +1,9 @@
 package top.dzurl.pushwebpage.core.helper
 
-
+import com.github.dockerjava.api.DockerClient
+import com.github.dockerjava.core.DefaultDockerClientConfig
+import com.github.dockerjava.core.DockerClientBuilder
+import com.github.dockerjava.core.DockerClientConfig
 import groovy.util.logging.Log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -27,10 +30,31 @@ class DockerHelper {
     private PushTaskConf pushTaskConf
 
 
+    //docker的客户端
+    private DockerClient dockerClient;
+
+
+    @Autowired
+    private void init() {
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .withDockerHost("unix://" + pushTaskConf.getDockerSock())
+                .build()
+        dockerClient = DockerClientBuilder.getInstance(config).build()
+    }
+
+
     /**
-     * 取出本机的ip
+     * 获取docker的客户端
      * @return
      */
+    DockerClient getDockerClient() {
+        return dockerClient
+    }
+
+/**
+ * 取出本机的ip
+ * @return
+ */
     String getMyIp() {
         //取出自己的ip
         Process process = Runtime.getRuntime().exec("hostname -i")
@@ -66,6 +90,14 @@ class DockerHelper {
         return (ret != null && ret != [] && ret['Id'] == id) ? ret['State'] : null
     }
 
+    /**
+     * 查询容器日志
+     * @param id
+     * @return
+     */
+    String getLogs(String id) {
+        return executeCmd(new DockerCurlExecute(String.format("http://localhost/containers/%s/logs?stdout=true", id)))
+    }
 
     /**
      * 创建docker容器
@@ -163,7 +195,14 @@ class DockerHelper {
         //删除临时的脚本文件
         outFile.delete()
 
-        return StringUtils.hasText(cmd_ret) ? JsonUtil.toObject(cmd_ret, Object.class) : [:]
+        //为空的判断
+        if (!StringUtils.hasText(cmd_ret)) {
+            return [:]
+        }
+        cmd_ret = cmd_ret.trim()
+
+        //判断是否json格式,如果{[开头自动转JSON对象,否则为字符串
+        return Arrays.binarySearch(new String[]{"[", "{"}, cmd_ret.substring(0, 1)) > -1 ? JsonUtil.toObject(cmd_ret, Object.class) : cmd_ret
     }
 
 

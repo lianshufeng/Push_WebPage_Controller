@@ -32,12 +32,6 @@ public class DockerCreate {
 
 
     /**
-     * 挂在的目录 : xx:11
-     */
-    private String[] Binds;
-
-
-    /**
      * 暴露的端口
      */
     private Map<String, Map<String, String>> ExposedPorts;

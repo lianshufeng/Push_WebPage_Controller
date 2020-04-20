@@ -48,7 +48,7 @@ public class PushWebPageTaskService extends StreamTaskService {
         DockerCreate dockerCreate = buildDockerCreate(baseParm);
 
         //挂载
-        dockerCreate.setBinds(new String[]{"/dev/shm:/dev/shm"});
+        dockerCreate.getHostConfig().put("Binds", new String[]{"/dev/shm:/dev/shm"});
 
 
         //运行环境

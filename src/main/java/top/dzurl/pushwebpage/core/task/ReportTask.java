@@ -1,17 +1,13 @@
 package top.dzurl.pushwebpage.core.task;
 
-import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import top.dzurl.pushwebpage.core.conf.PushTaskConf;
+import top.dzurl.pushwebpage.core.helper.DockerHelper;
 import top.dzurl.pushwebpage.core.service.ReportService;
 
 
@@ -25,41 +21,22 @@ public class ReportTask {
 
 
     @Autowired
-    private PushTaskConf pushTaskConf;
-
-    @Autowired
     private ReportService reportService;
 
-    //docker的客户端
-    private DockerClient docker;
-
+    @Autowired
+    private DockerHelper dockerHelper;
 
     //记录将要报告的次数
     private Long recordReportCount = 0L;
 
 
-    @Autowired
-    private void init() {
-        createDockerClient();
-        listenReport();
-    }
-
-    /**
-     * 生产docker的java客户端
-     */
-    private void createDockerClient() {
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix://" + pushTaskConf.getDockerSock())
-                .build();
-        docker = DockerClientBuilder.getInstance(config).build();
-    }
-
     /**
      * 监视docker的事件
      */
+    @Autowired
     @SneakyThrows
     private void listenReport() {
-        docker.eventsCmd()
+        dockerHelper.getDockerClient().eventsCmd()
                 .exec(new ResultCallbackTemplate() {
                     @Override
                     public void onNext(Object item) {

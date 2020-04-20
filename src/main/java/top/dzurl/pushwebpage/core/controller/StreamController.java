@@ -8,12 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.dzurl.pushwebpage.core.helper.DockerHelper;
 import top.dzurl.pushwebpage.core.model.BaseTaskParm;
-import top.dzurl.pushwebpage.core.model.DockerProcess;
 import top.dzurl.pushwebpage.core.model.report.RequestReport;
 import top.dzurl.pushwebpage.core.model.report.ResponseReport;
 import top.dzurl.pushwebpage.core.service.StreamService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -88,7 +86,6 @@ public class StreamController {
      */
     private Object _create(BaseTaskParm parm) {
         Assert.hasText(parm.getUrl(), "源数据地址不能为空");
-        Assert.hasText(parm.getPushUrl(), "推流地址不能为空");
         return this.streamService.create(parm);
     }
 

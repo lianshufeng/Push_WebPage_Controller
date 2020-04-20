@@ -19,6 +19,12 @@ public enum StreamTaskType {
 
 
     /**
+     * 显示流的信息
+     */
+    ShowStream,
+
+
+    /**
      * Web网页推送
      */
     PushWebPage;
